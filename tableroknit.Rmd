@@ -1,0 +1,84 @@
+---
+title: "Tableros de Cantones"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r paquetes}
+# Paquetes
+install.packages("dplyr")
+library(dplyr)
+library(sf)
+library(DT)
+library(ggplot2)
+library(plotly)
+library(leaflet)
+install.packages("shiny")
+library(shiny)
+install.packages("contrib.url")
+library(contrib.url)
+View(cantones_simplificados)
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r lectura datos}
+cantones <- 
+  st_read(dsn = "cantones_simplificados.geojson.txt") 
+  st_transform (4326) 
+
+```
+
+### mapa
+
+
+```
+
+
+  
+```
+
+
+```{r tabla}
+#Tabla
+cantones %>%
+st_drop_geometry() %>%
+  select( provincia, canton, area) %>%
+  arrange(desc(area)) %>%
+datatable(
+  colnames = c("Provincia", "Cantón", "área (km2)"),
+  options= list(
+    pageLeght = 5,
+    languaje = list(url =
+"//cdn,datatables.net/plug-ins/1.10.11/i18n/spanish,json")
+  )
+)
+```
+
+```{r GRAFICO}
+# Grafico
+
+grafico_ggplot2 <- cantones %>%
+   st_drop_geometry() %>%
+slice_max(area, n= 5) %>%
+ggplot(aes(x = reorder(canton, -area), y = area)) +
+geom_bar(stat = "identity")
+
+ggplotly(grafico_ggplot2)
+  
+```
+
